@@ -11,7 +11,7 @@ import static org.apache.http.HttpStatus.*;
 import static org.hamcrest.CoreMatchers.is;
 
 
-public class CreateOrderWithLoginTests extends BaseTests {
+public class CreateOrderWithoutLoginTests extends BaseTests {
 
     private Order order = new Order();
     private OrderSteps orderSteps = new OrderSteps();
@@ -56,5 +56,4 @@ public class CreateOrderWithLoginTests extends BaseTests {
                 .body("success", is(false))
                 .extract().response();
     }
-
 }
