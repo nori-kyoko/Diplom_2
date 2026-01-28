@@ -1,3 +1,4 @@
+import io.qameta.allure.Description;
 import io.qameta.allure.junit4.DisplayName;
 import io.restassured.RestAssured;
 import io.restassured.filter.log.RequestLoggingFilter;
@@ -32,44 +33,42 @@ public class CreateUserTests extends BaseTests {
 
     @Test
     @DisplayName("Тест на создание пользователя")
+    @Description("Попытка регистрации пользователя с валидными данными")
     public void shouldCreateUser() {
-        Response response = userSteps.createUser(user)
+        userSteps.createUser(user)
                 .statusCode(SC_OK)
                 .body("success", is(true))
                 .extract().response();
 
-        String accessToken = response.jsonPath().getString("accessToken");
-        user.withAccessToken(accessToken);
     }
 
     @Test
     @DisplayName("Тест на создание пользователя, который уже зарегистрирован")
+    @Description("Попытка повторной регистрации пользователя с одинаковыми данными")
     public void isPossibleToCreateIdenticalUser() {
         userSteps.createUser(user);
-        Response response = userSteps.createUser(user)
+        userSteps.createUser(user)
                 .statusCode(SC_FORBIDDEN)
                 .body("message", is("User already exists"))
                 .extract().response();
 
-        String accessToken = response.jsonPath().getString("accessToken");
-        user.withAccessToken(accessToken);
     }
 
     @Test
     @DisplayName("Создание пользователя без обязательного поля email")
+    @Description("Попытка регистрации пользователя без обязательного поля email")
     public void isPossibleToCreateUserWithoutEmail() {
         user.withEmail("");
-        Response response = userSteps.createUser(user)
+        userSteps.createUser(user)
                 .statusCode(SC_FORBIDDEN)
                 .body("message", is("Email, password and name are required fields"))
                 .extract().response();
 
-        String accessToken = response.jsonPath().getString("accessToken");
-        user.withAccessToken(accessToken);
     }
 
     @Test
     @DisplayName("Создания пользователя без обязательного поля пароль")
+    @Description("Попытка создания пользователя без обязательного поля пароль")
     public void isPossibleToCreateUserWithoutPassword() {
         user.withPassword("");
         Response response = userSteps.createUser(user)
@@ -83,25 +82,34 @@ public class CreateUserTests extends BaseTests {
 
     @Test
     @DisplayName("Создание пользователя без обязательного поля имя")
+    @Description("Попытка создания пользователя без обязательного поля имя")
     public void isPossibleToCreateUserWithoutName() {
         user.withName("");
-        Response response = userSteps.createUser(user)
+        userSteps.createUser(user)
                 .statusCode(SC_FORBIDDEN)
                 .body("message", is("Email, password and name are required fields"))
                 .extract().response();
 
-        String accessToken = response.jsonPath().getString("accessToken");
-        user.withAccessToken(accessToken);
     }
 
     @After
     public void tearDown() {
-        if (user == null || user.getAccessToken() == null) {
+        if (user == null) {
             return;
         }
 
         try {
-            String accessToken = user.getAccessToken();
+
+            Response loginResponse = userSteps.loginUser(user)
+                    .extract()
+                    .response();
+
+            String accessToken = loginResponse.jsonPath().getString("accessToken");
+
+            if (accessToken == null) {
+                return;
+            }
+
             String jwtToken = accessToken.startsWith("Bearer ")
                     ? accessToken.substring(7)
                     : accessToken;

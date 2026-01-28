@@ -1,3 +1,4 @@
+import io.qameta.allure.Description;
 import io.qameta.allure.junit4.DisplayName;
 import io.restassured.RestAssured;
 import io.restassured.filter.log.RequestLoggingFilter;
@@ -33,47 +34,53 @@ public class LoginUserTests extends BaseTests {
 
     @Test
     @DisplayName("Тест на вход под существующим пользователем")
+    @Description("Попытка входа по логину и паролю зарегистрированному пользователю")
     public void shouldLoginUserTest() {
-        Response response = userSteps.loginUser(user)
+        userSteps.loginUser(user)
                    .statusCode(SC_OK)
                    .body("success", is(true))
                    .extract().response();
-        String accessToken = response.jsonPath().getString("accessToken");
-        user.withAccessToken(accessToken);
     }
 
     @Test
     @DisplayName("Тест попытки авторизации с неверным логином")
+    @Description("Попытка входа по неверному адресу электронной почты")
     public void isPossibleToLogInWithWrongEmail() {
         user.withEmail("wrongEmail@yandex.ru");
-        Response response = userSteps.loginUser(user)
+        userSteps.loginUser(user)
                 .statusCode(SC_UNAUTHORIZED)
                 .body("success", is(false))
                 .extract().response();
-        String accessToken = response.jsonPath().getString("accessToken");
-        user.withAccessToken(accessToken);
     }
 
     @Test
     @DisplayName("Тест попытки авторизации с неверным паролем")
+    @Description("Попытка входа под зарегистрированным логином, но неверным паролем")
     public void isPossibleToLogInWithWrongPassword() {
         user.withPassword("1234567");
-        Response response = userSteps.loginUser(user)
+        userSteps.loginUser(user)
                 .statusCode(SC_UNAUTHORIZED)
                 .body("success", is(false))
                 .extract().response();
-        String accessToken = response.jsonPath().getString("accessToken");
-        user.withAccessToken(accessToken);
     }
 
     @After
     public void tearDown() {
-        if (user == null || user.getAccessToken() == null) {
+        if (user == null) {
             return;
         }
 
         try {
-            String accessToken = user.getAccessToken();
+            Response loginResponse = userSteps.loginUser(user)
+                    .extract()
+                    .response();
+
+            String accessToken = loginResponse.jsonPath().getString("accessToken");
+
+            if (accessToken == null) {
+                return;
+            }
+
             String jwtToken = accessToken.startsWith("Bearer ")
                     ? accessToken.substring(7)
                     : accessToken;
@@ -84,5 +91,4 @@ public class LoginUserTests extends BaseTests {
             System.err.println("Cleanup failed: " + e.getMessage());
         }
     }
-
 }

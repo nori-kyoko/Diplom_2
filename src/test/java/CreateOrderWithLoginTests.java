@@ -1,3 +1,4 @@
+import io.qameta.allure.Description;
 import io.qameta.allure.junit4.DisplayName;
 import io.restassured.RestAssured;
 import io.restassured.filter.log.RequestLoggingFilter;
@@ -35,6 +36,7 @@ public class CreateOrderWithLoginTests extends BaseTests {
 
     @Test
     @DisplayName("Создания заказ c авторизации с ингредиентами")
+    @Description("Попытка создания заказа авторизованным пользователем с ингредиентами")
     public void isPossibleCreateOrderWithAuthorizationWithIngredients() {
         String[] ingredients = {
                 "61c0c5a71d1f82001bdaaa6d",
@@ -50,6 +52,7 @@ public class CreateOrderWithLoginTests extends BaseTests {
 
     @Test
     @DisplayName("Создание заказа c авторизации без ингредиентов")
+    @Description("Попытка создания заказа авторизованным пользователем без ингредиентов")
     public void isPossibleCreateOrderWithoutAuthorizationWithoutIngredients() {
         String[] ingredients = {};
         order.withIngredients(ingredients);
@@ -61,6 +64,7 @@ public class CreateOrderWithLoginTests extends BaseTests {
 
     @Test
     @DisplayName("Создание заказа c авторизации с неверным хешем ингредиентов")
+    @Description("Попытка заказа авторизованным пользователем с несуществующими хешами в базе данных ингредиентов")
     public void isPossibleCreateOrderWithoutAuthorizationWithWrongIngredients() {
         String[] ingredients = {"60d3b41abdacab0026a733c6", "609646e4dc916e00276b2870"};
         order.withIngredients(ingredients);
