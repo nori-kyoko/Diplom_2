@@ -50,6 +50,7 @@ public class LoginUserTests extends BaseTests {
         userSteps.loginUser(user)
                 .statusCode(SC_UNAUTHORIZED)
                 .body("success", is(false))
+                .body("message", is("email or password are incorrect"))
                 .extract().response();
     }
 
@@ -61,6 +62,7 @@ public class LoginUserTests extends BaseTests {
         userSteps.loginUser(user)
                 .statusCode(SC_UNAUTHORIZED)
                 .body("success", is(false))
+                .body("message", is("email or password are incorrect"))
                 .extract().response();
     }
 

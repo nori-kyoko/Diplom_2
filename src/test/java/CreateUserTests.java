@@ -49,6 +49,7 @@ public class CreateUserTests extends BaseTests {
         userSteps.createUser(user);
         userSteps.createUser(user)
                 .statusCode(SC_FORBIDDEN)
+                .body("success", is(false))
                 .body("message", is("User already exists"))
                 .extract().response();
 
@@ -61,6 +62,7 @@ public class CreateUserTests extends BaseTests {
         user.withEmail("");
         userSteps.createUser(user)
                 .statusCode(SC_FORBIDDEN)
+                .body("success", is(false))
                 .body("message", is("Email, password and name are required fields"))
                 .extract().response();
 
@@ -71,13 +73,12 @@ public class CreateUserTests extends BaseTests {
     @Description("Попытка создания пользователя без обязательного поля пароль")
     public void isPossibleToCreateUserWithoutPassword() {
         user.withPassword("");
-        Response response = userSteps.createUser(user)
+        userSteps.createUser(user)
                 .statusCode(SC_FORBIDDEN)
+                .body("success", is(false))
                 .body("message", is("Email, password and name are required fields"))
                 .extract().response();
 
-        String accessToken = response.jsonPath().getString("accessToken");
-        user.withAccessToken(accessToken);
     }
 
     @Test
@@ -87,6 +88,7 @@ public class CreateUserTests extends BaseTests {
         user.withName("");
         userSteps.createUser(user)
                 .statusCode(SC_FORBIDDEN)
+                .body("success", is(false))
                 .body("message", is("Email, password and name are required fields"))
                 .extract().response();
 

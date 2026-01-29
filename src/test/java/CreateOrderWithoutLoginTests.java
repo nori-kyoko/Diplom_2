@@ -46,6 +46,7 @@ public class CreateOrderWithoutLoginTests extends BaseTests {
         orderSteps.createOrder(order)
                 .statusCode(SC_BAD_REQUEST)
                 .body("success", is(false))
+                .body("message", is("Ingredient ids must be provided"))
                 .extract().response();
     }
 
